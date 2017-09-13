@@ -1,8 +1,10 @@
 package com.octo.ffc;
 
+import com.octo.ffc.exceptions.ReaderException;
+import com.octo.ffc.exceptions.WriterException;
 import com.octo.ffc.file.reader.FakeFileReaderImpl;
 import com.octo.ffc.file.reader.FileReader;
-import com.octo.ffc.file.reader.OnDemandFileReader;
+import com.octo.ffc.file.reader.ProgressiveFileReader;
 import com.octo.ffc.file.writer.CsvFileWriter;
 import com.octo.ffc.file.writer.FileWriter;
 import com.octo.ffc.layouts.FileLayout;
@@ -16,31 +18,37 @@ import java.util.List;
 public class TransformerController {
 
 
-    public void transformToCsv(String metadataFileName, String dataFileName, String destinationFileName) throws Exception {
+    private final FileLayoutCreator fileLayoutCreator;
+
+    public TransformerController() {
+        fileLayoutCreator = new FileLayoutCreator();
+    }
+
+    public void transformToCsv(String metadataFileName, String dataFileName, String destinationFileName, char fieldSeparator, String lineSeparator) throws Exception {
         StopWatch stopWatch = StopWatch.createStarted();
-        FileReader dataFileReader = new OnDemandFileReader(dataFileName);
+        FileReader dataFileReader = new ProgressiveFileReader(dataFileName);
+        FileWriter csvFileWriter = new CsvFileWriter(destinationFileName, fieldSeparator, lineSeparator);
 
-        FileWriter csvFileWriter = new CsvFileWriter(destinationFileName, ';', "\n");
-        FileLayoutCreator fileLayoutCreator = new FileLayoutCreator();
         FileLayout fileLayout = fileLayoutCreator.createFileLayout(metadataFileName);
-        List<String> rawData;
-        List<String[]> rows;
-        csvFileWriter.write(fileLayout.getColumnHeaders());
-        while (true) {
-            rawData = dataFileReader.readLines();
-            if (rawData.size() == 0) {
-                System.out.println(LocalDateTime.now() + " End of data file reached");
-                break;
-            }
-            rows = convertToRows(rawData, fileLayout);
-            rawData.clear();
-            csvFileWriter.write(rows);
-            rows.clear();
-
-        }
+        writeHeaders(csvFileWriter, fileLayout);
+        writeBody(dataFileReader, csvFileWriter, fileLayout);
         stopWatch.stop();
         System.out.println(LocalDateTime.now() + " Transformation finished on " + stopWatch.getTime()/1000f + " seconds");
 
+    }
+
+    private void writeHeaders(FileWriter csvFileWriter, FileLayout fileLayout) throws WriterException {
+        csvFileWriter.write(fileLayout.getColumnHeaders());
+    }
+
+    private void writeBody(FileReader dataFileReader, FileWriter csvFileWriter, FileLayout fileLayout) throws ReaderException, WriterException {
+        List<String> rawData;
+        List<String[]> rows;
+        while (dataFileReader.isNotEOF()) {
+            rawData = dataFileReader.readLines();
+            rows = convertToRows(rawData, fileLayout);
+            csvFileWriter.write(rows);
+        }
     }
 
     private List<String[]> convertToRows(List<String> readLines, FileLayout fileLayout) {
@@ -51,8 +59,4 @@ public class TransformerController {
         return convertedCells;
     }
 
-    public static void main(String[] args) throws Exception {
-        TransformerController transformerController = new TransformerController();
-        transformerController.transformToCsv("metadata.txt", "data.txt", "output.csv");
-    }
 }

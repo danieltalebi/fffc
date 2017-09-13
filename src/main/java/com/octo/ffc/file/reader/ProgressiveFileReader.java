@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OnDemandFileReader implements FileReader {
+public class ProgressiveFileReader implements FileReader {
 
     public static final int CHUNK_SIZE = 10000;
     private LineIterator lineIterator;
 
-    public OnDemandFileReader(String filename) throws ReaderException {
+    public ProgressiveFileReader(String filename) throws ReaderException {
         openFile(filename);
     }
 
@@ -27,6 +27,11 @@ public class OnDemandFileReader implements FileReader {
             counter++;
         }
         return linesRead;
+    }
+
+    @Override
+    public boolean isNotEOF() {
+        return lineIterator.hasNext();
     }
 
     private void openFile(String filename) throws ReaderException {

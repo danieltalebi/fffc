@@ -13,15 +13,20 @@ public class NumericColumn extends AbstractColumn {
 
     @Override
     public String transformValue(String data) {
+        data = data.trim();
         validateInput(data);
         return new BigDecimal(data).toPlainString();
     }
 
     private void validateInput(String data) {
         Validate.isTrue(StringUtils.isNotBlank(data), "The input cannot be null or empty");
-        String replace = data.replaceAll("[.-]", "");
-        if (replace.length() > super.getLength()) {
-            throw new IllegalArgumentException("The given number exceeds the maximum number of digits");
+        String unsignedInteger = data.replaceAll("[.-]", "");
+        if (unsignedInteger.length() > super.getLength()) {
+            throw new IllegalArgumentException("The given number exceeds the maximum number of digits. Input: "+ data);
         }
+        if (!StringUtils.isNumeric(unsignedInteger)) {
+            throw new IllegalArgumentException("The given input is not numeric: "+ data);
+        }
+
     }
 }

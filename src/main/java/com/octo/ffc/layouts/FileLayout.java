@@ -5,6 +5,7 @@ import com.octo.ffc.columns.AbstractColumn;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 public class FileLayout {
@@ -18,7 +19,7 @@ public class FileLayout {
     }
 
     public void addColumns(List<AbstractColumn> columnList) {
-        notNull(columnList);
+        notEmpty(columnList, "The List of Columns cannot be null or empty");
         this.columnList.addAll(columnList);
         for (AbstractColumn column : columnList) {
             maxLengthPerLine += column.getLength();
@@ -48,7 +49,8 @@ public class FileLayout {
     }
 
     public String[] convertToRow(String rawData) {
-        if (rawData.length() > maxLengthPerLine) {
+
+        if (rawData.replaceAll("[.]", "").length() > maxLengthPerLine) {
             throw new IllegalArgumentException("Row max size exceeded for input " + rawData);
         }
         String[] values = new String[columnList.size()];

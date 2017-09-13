@@ -35,4 +35,10 @@ public class NumericColumnTest {
         numericColumn.transformValue(" ");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void transformValue_inputTooLong() {
+        numericColumn.transformValue("123456");
+    }
+
+
 }

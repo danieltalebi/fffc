@@ -27,6 +27,11 @@ public class FakeFileReaderImpl implements FileReader {
         return linesRead;
     }
 
+    @Override
+    public boolean isNotEOF() {
+        return currentPosition < fakeFile.size();
+    }
+
     private int determineMaxPosition() {
         return currentPosition + ONE_THOUSAND_LINES < fakeFile.size() ? currentPosition + ONE_THOUSAND_LINES : fakeFile.size();
     }
@@ -34,7 +39,7 @@ public class FakeFileReaderImpl implements FileReader {
     private List<String> createFakeFile() {
         List<String> fakeLines = new ArrayList<>();
         for (int i = 0; i < 10000; i++) {
-            fakeLines.add("22Smith               John           1987-01-29");
+            fakeLines.add("-23. Smith               John           1987-01-29");
         }
         return fakeLines;
     }

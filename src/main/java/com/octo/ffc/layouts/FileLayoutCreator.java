@@ -1,6 +1,7 @@
 package com.octo.ffc.layouts;
 
 import com.octo.ffc.columns.AbstractColumn;
+import com.octo.ffc.exceptions.ParserException;
 import com.octo.ffc.exceptions.ReaderException;
 import com.octo.ffc.file.reader.FileReader;
 import com.octo.ffc.file.reader.FullLengthFileReader;
@@ -11,6 +12,12 @@ import java.util.List;
 import static org.apache.commons.lang3.Validate.notBlank;
 
 public class FileLayoutCreator {
+
+    private MetadataParser metadataParser;
+
+    public FileLayoutCreator() {
+        metadataParser = new MetadataParser();
+    }
 
     public FileLayout createFileLayout(String metadataFileName) throws Exception {
         List<String> metadata = getMetadata(metadataFileName);
@@ -24,8 +31,7 @@ public class FileLayoutCreator {
         return metadataFileReader.readLines();
     }
 
-    private List<AbstractColumn> convertMetadataToColumns(List<String> metadata) {
-        MetadataParser metadataParser = new MetadataParser();
+    private List<AbstractColumn> convertMetadataToColumns(List<String> metadata) throws ParserException {
         return metadataParser.parse(metadata);
     }
 

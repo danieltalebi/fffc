@@ -31,4 +31,9 @@ public class FullLengthFileReader implements FileReader {
         }
         return linesRead;
     }
+
+    @Override
+    public boolean isNotEOF() {
+        return true;
+    }
 }

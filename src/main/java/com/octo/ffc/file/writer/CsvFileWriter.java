@@ -30,13 +30,12 @@ public class CsvFileWriter implements FileWriter {
         } catch (IOException e) {
             throw new WriterException("There was a problem creating the writer for " + fileName, e);
         }
-
     }
 
     @Override
     public void write(String[] row) throws WriterException {
         try {
-            csvPrinter.printRecord(row);
+            csvPrinter.printRecord((Object[]) row);
         } catch (IOException e) {
             throw new WriterException("Unable to write records in file", e);
         }

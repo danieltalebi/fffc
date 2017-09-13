@@ -7,4 +7,6 @@ import java.util.List;
 public interface FileReader {
 
     List<String> readLines() throws ReaderException;
+
+    boolean isNotEOF();
 }

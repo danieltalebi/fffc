@@ -23,7 +23,6 @@ repositories {
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter')
     compile('org.apache.commons:commons-csv:1.5')
     compile('org.apache.commons:commons-lang3:3.6')
 	compile('commons-io:commons-io:2.5')
